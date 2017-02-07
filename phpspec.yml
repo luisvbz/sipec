@@ -1,0 +1,5 @@
+suites:
+    main:
+        namespace: sipec
+        psr4_prefix: sipec
+        src_path: sipec
