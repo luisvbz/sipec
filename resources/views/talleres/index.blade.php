@@ -140,6 +140,10 @@
   @include('talleres.nuevo')
   @include('talleres.aperturar')
   @include('talleres.participantes')
+
+   @if(Permiso::Imprimir('curtall'))
+    @include('talleres.certificado')
+   @endif
 </div>
 
 @endsection
@@ -539,6 +543,10 @@ Vue.http.headers.common['X-CSRF-TOKEN'] = $("#token").attr("value");
               this.buscarPart = '';
               this.participantes.participantes.push(response.body[0]);
           });
+      },
+      imprimirCertificado: function(){
+        //  $("#modalParticipantes").modal("hide");
+          $("#modalCertificaco").modal("show");
       },
       /** Funciones para marcar los checkboxes**/
       marcarAsistencia: function(id, asistencia, index){

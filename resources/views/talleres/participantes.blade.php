@@ -59,22 +59,35 @@
                         <td>@{{ part.apellidos.toUpperCase() }}, @{{ part.nombres.toUpperCase() }}</td>
                         <td><input type="checkbox" class="form-control" 
                                     v-bind:checked="part.inscrito" 
-                                    v-bind:disabled="part.inscrito"></td>
+                                    v-bind:disabled="part.inscrito">
+                        </td>
                         @if(Permiso::Modificar('curtall'))
                         <td><input type="checkbox" class="form-control" 
                                     v-bind:disabled="part.aprobado"
                                     v-model="part.asistencia" 
                                     v-on:change="marcarAsistencia(part.id, part.asistencia, index)" 
-                                    v-bind:checked="part.asistencia"></td>
+                                    v-bind:checked="part.asistencia">
+                        </td>
                         <td><input type="checkbox" class="form-control" 
                                     v-model="part.aprobado" 
                                     v-on:change="marcarAprobado(part.id, part.aprobado, index)" 
                                     v-bind:checked="part.aprobado" 
-                                    v-bind:disabled="!part.asistencia"></td>
+                                    v-bind:disabled="!part.asistencia">
+                        </td>
                         <td><input type="checkbox" class="form-control" 
                                     v-model="part.solvente"
                                     v-bind:checked="part.solvente"
-                                    v-on:change="marcarSolvente(part.id, part.solvente, index)" ></td>
+                                    v-on:change="marcarSolvente(part.id, part.solvente, index)" >
+                        </td>
+                        @endif
+                        @if(Permiso::Imprimir('curtall'))
+                        <td v-if="part.inscrito && part.asistencia && part.aprobado && part.solvente">
+                          <button 
+                            v-on:click="imprimirCertificado(part)"
+                            class="btn btn-xs btn-success" 
+                            rel="tooltip" 
+                            title="Imprimir certificado"><i class="fa fa-print"></i></button>
+                        </td>
                         @endif
                   </tr>
                 </template>
