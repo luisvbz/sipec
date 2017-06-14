@@ -38,7 +38,7 @@
           <div class="form-group">
               <table class="table" style="width: 100%;">
                    <tr>
-                     <td style="font-size: 12px;">Cantida Maxima: <b>@{{ nuevaApertura.cantidad }}</b></td>
+                     <td style="font-size: 12px;">Cantidad Maxima: <b>@{{ nuevaApertura.cantidad }}</b></td>
                      <td><button class="btn btn-xxs btn-primary" @click.prevent="nuevaApertura.cantidad++"><i class="fa fa-plus"></i></button></td>
                      <td><button class="btn btn-xxs btn-danger" @click.prevent="nuevaApertura.cantidad--" v-bind:disabled="nuevaApertura.cantidad == 0"><i class="fa fa-minus"></i></button></td>
                 </tr>

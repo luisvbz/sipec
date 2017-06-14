@@ -53,7 +53,9 @@
   <tr>
     <td class="tg-u1yq">Nro.</td>
     <td class="tg-u1yq">Cedula</td>
-    <td class="tg-u1yq" colspan="5">APELLIDOS Y NOMBRES</td>
+    <td class="tg-u1yq" colspan="3">APELLIDOS Y NOMBRES</td>
+    <td class="tg-u1yq">Correo</td>
+    <td class="tg-u1yq">Telefono</td>
   </tr>
   <tbody id="bodyPartPlanilla">
   

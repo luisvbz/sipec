@@ -10,13 +10,13 @@
 @stop
 
 @section('modulo')
-    Cursos y Talleres<br>/
-    <small>Lista de Cursos y talleres</small>
+    {!! $sede[0]->denominacion !!}<br>/
+    <small>Cursos y Talleres</small>
 @stop
 
 
 @section('contenido')
-<div id="app">
+<div id="app" v-cloak>
   <div class="row">
     <div class="col-md-9">
     <div class="alert alert-success" v-if="hasMensaje">
@@ -100,19 +100,13 @@
         Barra de herramientas
       </div>
       <div class="panel-body">
-      	<div class="form-group">
-      	<label>Sede:</label>
-      		<select  class="form-control" v-model="abrev_sede">
-      			<option value="0">Seleccione la sede</option>
-            @foreach($sedes as $sede)
-              <option value="{{ $sede->abrev }}">{!! $sede->denominacion !!}</option>
-            @endforeach
-      		</select>
-      	</div>
       	<div class="form-group pill-right">
       		<label>Año:</label>
       		<select  name="periodo" class="form-control" v-model="anio">
-      				<option value="2016">2016</option>
+            <option disabled>Seleccione</option>
+            @foreach(Auth::user()->periodos as $periodo)
+      				<option value="{{ $periodo->id }}">{!! $periodo->nom_periodo !!}</option>
+            @endforeach
       		</select>
       	</div>
       	<div class="form-group">
@@ -159,8 +153,8 @@ Vue.http.headers.common['X-CSRF-TOKEN'] = $("#token").attr("value");
   new Vue({
     el: '#app',
     data: {
-      abrev_sede: '0',
-      anio: '2016',
+      abrev_sede: '',
+      anio: '15',
       talleres : [],
       loader: false,
       id_seccion: 0, //Id de la seccion
@@ -168,7 +162,13 @@ Vue.http.headers.common['X-CSRF-TOKEN'] = $("#token").attr("value");
       curtall: [],
       tipo: '',// escoger si e curso o taller
       nuevocurtall: {tipo: '', titulo: '', uc: 0, hs: 0},
-      participantes: {agregar: false, participantes: [], participante: {idpart: 0, apellidos: '', nombres: '', existe: false, inscrito: false}},
+      participantes: {agregar: false, 
+                    participantes: [], 
+                    participante: {idpart: 0, 
+                                  apellidos: '', 
+                                  nombres: '', 
+                                  existe: false, 
+                                  inscrito: false}},
       nuevosModulos: [],
       agregar: false,
       hasMensaje: false,
@@ -186,6 +186,7 @@ Vue.http.headers.common['X-CSRF-TOKEN'] = $("#token").attr("value");
     },
     mounted: function(){
      this.loader = true;
+     this.abrev_sede = "{{ $sede[0]->abrev }}";
     },
     computed: {
         participantesFiltrados: function(){
@@ -307,6 +308,8 @@ Vue.http.headers.common['X-CSRF-TOKEN'] = $("#token").attr("value");
     methods: {
       getTalleres: function(abrev, anio){
 
+        this.abrev_sede = "{{ $sede[0]->abrev }}";
+
         if(this.abrev_sede == "0" || this.abrev_sede == "" || this.anio == ""){
 
             jQuery.gritter.add({
@@ -320,10 +323,10 @@ Vue.http.headers.common['X-CSRF-TOKEN'] = $("#token").attr("value");
 
         }else{ 
           
-          this.$http.post('/administracion/cargarTallares', {abrev: abrev, anio: anio}).then(function(response){
+          this.$http.post('/administracion/cargarTallares', {abrev: this.abrev_sede, anio: anio}).then(function(response){
               this.talleres = [];
               if(response.body.length == 0){
-                  jAlert('No se encontro información disponible con esta busqueda!', 'Advertencia');
+                  jAlert('No se encontraron cursos y/o talleres en este periodo!', 'Advertencia');
               }else{
                   for (var i = 0; i < response.body.length ;  i++) {
                   this.talleres.push(response.body[i]);
@@ -451,7 +454,7 @@ Vue.http.headers.common['X-CSRF-TOKEN'] = $("#token").attr("value");
 
           }else{
               this.hasMensaje = false;
-              this.$http.post('/administracion/aperturarCurtall', { profesor: profesor, cantidad: cantidad,curtall: curtall, sede: sede, codigo: codigo}).then(function(response){
+              this.$http.post('/administracion/aperturarCurtall', { profesor: profesor, cantidad: cantidad,curtall: curtall, sede: sede, codigo: codigo, anio: this.anio}).then(function(response){
 
               console.log(response.body);
 
@@ -544,7 +547,7 @@ Vue.http.headers.common['X-CSRF-TOKEN'] = $("#token").attr("value");
               this.participantes.participantes.push(response.body[0]);
           });
       },
-      imprimirCertificado: function(){
+      imprimirCertificado: function(part){
         //  $("#modalParticipantes").modal("hide");
           $("#modalCertificaco").modal("show");
       },
@@ -568,7 +571,7 @@ Vue.http.headers.common['X-CSRF-TOKEN'] = $("#token").attr("value");
       /** Fin funciones para marcar los checkbox**/
       clean: function(){
             this.abrev_sede = '0';
-            this.anio = '2016';
+            this.anio = '2017';
             this.talleres = [];
       }
     }

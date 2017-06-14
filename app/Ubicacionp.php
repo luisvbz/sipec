@@ -10,9 +10,18 @@ class Ubicacionp extends Model
 
 	protected $table = 'principal.participantes_ubicacion';
 
+	public $timestamps = FALSE;
+
 	public function entorno(){
 
 		return $this->hasOne('sipec\Ubicacion', 'id', 'id_ubicacion');
 
 	}
+
+	public function participante(){
+
+		return $this->hasOne('sipec\Participante', 'id', 'id_participante');
+
+	}
+
 }

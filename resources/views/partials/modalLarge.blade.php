@@ -15,6 +15,9 @@
       <div class="modal-footer" id="mgtools">
       
       </div>
+      <div class="modal-footer" id="mgnuepart" style="display:none;">
+
+      </div>
     </div>
 
   </div>

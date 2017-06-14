@@ -19,16 +19,16 @@
                     v-model="filtro.queryPart">
         </div>
         <div class="form-group">
+              <input type="radio" value="1" v-model="filtro.tipo">
               <label>Cedula</label>
-            <input type="radio" value="1" v-model="filtro.tipo">
         </div>
         <div class="form-group">
+              <input type="radio" value="2" v-model="filtro.tipo">
               <label>Apellidos</label>
-            <input type="radio" value="2" v-model="filtro.tipo">
         </div>
         <div class="form-group">
+              <input type="radio" value="3" v-model="filtro.tipo">
               <label>Nombres</label>
-            <input type="radio" value="3" v-model="filtro.tipo">
         </div>
     </form>
         
@@ -96,7 +96,7 @@
       </div>
       <div class="modal-footer">
         @if(Permiso::Incluir('curtall'))
-      <button id="btnFormAdd" v-on:click="participantes.agregar = true" class="btn btn-xs btn-primary pull-left">Agregar Participante <i class="fa fa-plus"></i></button><div v-if="participantes.agregar" class="form-inline pull-left" id="divpart" style="margin-left:0px;"><input v-model="buscarPart" name="cedula" class="form-control" placeholder="Cedula de Identidad" style="width:200px; margin-left:50px;" type="text"><label style="width: 400px; margin-left:10px; text-align:left;"><span v-if="participantes.participante.existe">@{{ participantes.participante.apellidos }}, @{{ participantes.participante.nombres }}</span></label><button id="btnadd" v-if="participantes.participante.existe || participantes.participante.inscrito" v-on:click="registrarParticipante" v-bind:disabled="!participantes.participante.existe || participantes.participante.inscrito" rel="tooltip" title="Agregar" class="btn btn-xs btn-success"><i class="fa fa-save"></i></button><button v-on:click="participantes.agregar = false" rel="tooltip" title="Cancelar" onclick="CancelarAddPart()" class="btn btn-xs btn-danger"><i class="fa fa-minus"></i></button>@endif</div></div>
+      <button id="btnFormAdd" v-on:click="participantes.agregar = true" class="btn btn-xs btn-primary pull-left">Agregar Participante <i class="fa fa-plus"></i></button><div v-if="participantes.agregar" class="form-inline pull-left" id="divpart" style="margin-left:0px;"><input v-model="buscarPart" name="cedula" class="form-control" placeholder="Cedula de Identidad" style="width:200px; margin-left:20px;" type="text"><label style="width: 400px; margin-left:10px; text-align:left;" v-on:keydown.enter="participantes.participante.existe || participantes.participante.inscrito ? regisregistrarParticipante() : ''"><span v-if="participantes.participante.existe">@{{ participantes.participante.apellidos }}, @{{ participantes.participante.nombres }}</span></label><button id="btnadd" v-if="participantes.participante.existe || participantes.participante.inscrito" v-on:click="registrarParticipante" v-bind:disabled="!participantes.participante.existe || participantes.participante.inscrito" rel="tooltip" title="Agregar" class="btn btn-xs btn-success"><i class="fa fa-save"></i></button><button v-on:click="participantes.agregar = false" rel="tooltip" title="Cancelar" onclick="CancelarAddPart()" class="btn btn-xs btn-danger"><i class="fa fa-minus"></i></button>@endif</div></div>
     </div>
   </div>
 </div>

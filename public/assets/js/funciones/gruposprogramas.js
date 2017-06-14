@@ -1,7 +1,7 @@
 function nuevoGrupo(){
 
-		var sede = $("#sede").val();
-		var programa = $("#sprograma").val();
+		var sede = abrev_sede;
+		var programa = abrev_proyec;
 		var periodo = $("#periodo").val();
 
 		if(sede == null || programa == null || periodo == null)	{
@@ -24,7 +24,7 @@ function nuevoGrupo(){
  $('select[name="pensum"]').change(function(){
 
  	var pensum = $(this).val();
- 	var programa = $("#sprograma").val();
+ 	var programa = abrev_proyec;
  	var smodulos = $("#selectModulos");
  	var modulos = $("#modulos");
  	
@@ -40,7 +40,7 @@ function nuevoGrupo(){
          // $("#modulos").html('<img id="loader" alt="" src="/assets/images/loaders/loader1.gif>');
         }, 
         success: function(data){
-
+            smodulos.empty();
         	 for (var i = 0; i < data.length; i++) {
 
         		var posicion = data[i][2];
@@ -68,8 +68,8 @@ function nuevoGrupo(){
 
 function guardarGrupo(){
 
-	var sede = $("#sede").val();
-	var programa = $("#sprograma").val();
+	var sede = abrev_sede;
+	var programa = abrev_proyec;
 	var periodo = $("#periodo").val();
 	var periodo_text = $("#periodo :selected").text();
 	var pensum = $('select[name="pensum"]').val();

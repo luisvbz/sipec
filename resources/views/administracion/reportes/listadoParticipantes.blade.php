@@ -101,7 +101,9 @@
   <tr>
     <th class="tg-u1yq">Nro.</th>
     <th class="tg-u1yq">Cedula</th>
-    <th class="tg-u1yq" colspan="5">APELLIDOS Y NOMBRES</th>
+    <th class="tg-u1yq" colspan="3">APELLIDOS Y NOMBRES</th>
+    <th class="tg-u1yq">Correo</th>
+    <th class="tg-u1yq">Telefono</th>
   </tr>
   </thead>
   <tbody>
@@ -109,7 +111,9 @@
     <tr>
     <td class="tg-s6z2">{!! $p[0]!!}</td>
     <td class="tg-s6z2">{!! $p[1] !!}</td>
-    <td class="tg-s6z3" colspan="5">{!! $p[2]!!}</td>
+    <td class="tg-s6z3" colspan="3">{!! $p[2]!!}</td>
+    <td class="tg-s6z3">{!! strtolower($p[3])!!}</td>
+    <td class="tg-s6z3">{!! $p[4]!!}</td>
   </tr>
   @endforeach
   </tbody>

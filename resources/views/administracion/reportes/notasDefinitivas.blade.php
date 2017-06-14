@@ -56,8 +56,9 @@
         text-align: center;
       }
 
-      .page-number:before {
-        content: "Pagina " counter(page);
+      .page-number:after {
+        counter-increment: page;
+    content: "Page " counter(page) " of " counter(pages);
       }
 
 #facilitador{
@@ -191,7 +192,7 @@
     <table class="tg" id="notasPart" style="width:14cm;">
     <thead>
   <tr>
-    <td class="tg-8ua6" colspan="7">PLANILLA DE CALIFICACIÓN DEFINITIVA</td>
+    <td class="tg-8ua6" colspan="7">PLANILLA DE CALIFICACIÓN DEFINITIVA # {!! $id_constancia !!}</td>
   </tr>
   <tr>
     <td class="tg-uqo3" colspan="7">UNIDAD DE EDUCACIÓN CONTINUA</td>

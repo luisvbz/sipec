@@ -35,7 +35,7 @@
                 
                 <div class="header-right">
                         <span style="margin-bottom: 0px; color: white; font-size: 20px;">
-                        Sistema de Informacion para Partticipantes de la Unidad de Educación Continua
+                        Educación Continua
                         </span>
 
                     <div class="pull-right">  
@@ -60,6 +60,7 @@
                 
             </div><!-- headerwrapper -->
         </header>
+
         
         <section>
             <div class="mainwrapper">
@@ -101,8 +102,9 @@
                             @endif
                         </div>
                     </div><!-- media -->
-                    <h5 class="leftpanel-title">Menú Principal</h5>
-                    <ul class="nav nav-pills nav-stacked">
+                    <h5 class="leftpanel-title">Sedes</h5>
+                    <hr>
+                   <!-- <ul class="nav nav-pills nav-stacked">
                          @if(Auth::check())
                         <li {{ (Request::is('/') ? ' class=active' : '') }}><a href="{{ URL::to('/') }}"><i class="fa fa-home"></i> <span>Principal</span></a></li>
                         @foreach(Auth::user()->modulos as $modulo)
@@ -127,25 +129,67 @@
                         @else
                         <li {{ (Request::is('participante') ? ' class=active' : '') }}><a href="{{ URL::to('#') }}"><i class="fa fa-home"></i> <span>Principal</span></a>
                             @if(Request::is('participante/actacademica*'))
-                                <li class="parent active"><a href="{{ URL::to('#') }}"><i class="fa fa-graduation-cap"></i> <span>Actuación Académica</span></a>
+                                <li class="active"><a href="{{ route('actacademica') }}"><i class="fa fa-graduation-cap"></i> <span>Actuación Académica</span></a>
                             @else
-                                <li class="parent"><a href="#"><i class="fa fa-graduation-cap"></i> <span>Actuación Académica</span></a>
-                             @endif
-                             @if(Request::is('participante/actacademica'))
-                               <ul class="children">
-                                                <li class="active"><a href="{{ route('actacademica') }}"><i class="fa fa-edit"></i> Recor Académico</a></li> 
-                                            </ul>
-                            @else
-                                <ul class="children">
-                                                <li><a href="{{ route('actacademica') }}"><i class="fa fa-edit"></i> Recor Académico</a></li> 
-                                            </ul>
-                             @endif
+                                <li ><a  href="{{ route('actacademica') }}"><i class="fa fa-graduation-cap"></i> <span>Actuación Académica</span></a>
+                             @endif 
                         @endif
 
+                    </ul> -->
+
+             @if(Auth::check())
+                <ul id="tree3">
+                @foreach(Auth::user()->sedes as $sede)
+                <li><a href="#">{!! $sede->denominacion !!}</a>
+                    <ul>
+                    @foreach(Auth::user()->proyectos as $proyectos)
+                        <?php $proyec = Auth::user()->tree($sede->id, $proyectos->id);?>
+                        @if(count($proyec) > 0)
+                        <li class="subli"><a class="active" href="/administracion/programas/{{ $proyectos->abrev}}/{{ $sede->abrev }}">{!!  substr($proyec[0]->proyecto->denominacion, 0, 30)  !!}</a></li>
+                        @endif
+                    @endforeach
+                    @if(Auth::user()->cursosTalleres() == true)
+                        <li ><a class="active" href="/administracion/curtall/{{ $sede->abrev }}">Cursos y Talleres</a></li>
+                        @endif
                     </ul>
+                </li>
+                @endforeach
+            </ul>
+             @else
+                <li {{ (Request::is('participante') ? ' class=active' : '') }}><a href="{{ URL::to('#') }}"><i class="fa fa-home"></i> <span>Principal</span></a>
+                    @if(Request::is('participante/actacademica*'))
+                        <li class="active"><a href="{{ route('actacademica') }}"><i class="fa fa-graduation-cap"></i> <span>Actuación Académica</span></a>
+                    @else
+                        <li ><a  href="{{ route('actacademica') }}"><i class="fa fa-graduation-cap"></i> <span>Actuación Académica</span></a>
+                     @endif 
+
+            @endif
                 </div><!-- leftpanel -->
-                
                 <div class="mainpanel">
+                    @if(Auth::check())
+                    <div class="row">
+                        <div class="col-lg-12" style="margin-bottom: -20px;">
+                            <nav class="navbar navbar-inverse bg-primary">
+                              <div class="container-fluid">
+                                <ul class="nav navbar-nav">
+                                  <li {{ (Request::is('/') ? ' class=active' : '') }}><a href="/">Inicio</a></li>
+                                  @foreach(Auth::user()->modulos as $modulo)
+                                    @if($modulo->id_arbol == 0 AND $modulo->menu == TRUE)
+                                        <li class="dropdown">
+                                          <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false"><i class="{{ $modulo->icon_class}}"></i> {!! $modulo->nombre !!} <span class="caret"></span></a>
+                                    @elseif($modulo->id_arbol != 0 AND $modulo->menu == TRUE)
+                                         <ul class="dropdown-menu">
+                                            <li><a href="{{ url($modulo->ruta) }}">{!! $modulo->nombre !!}</a></li>
+                                          </ul>
+                                        </li>
+                                    @endif
+                                @endforeach
+                                </ul>
+                              </div>
+                            </nav>
+                        </div>
+                    </div>
+                    @endif
                     <div class="pageheader">
                         <h4>@yield('modulo')</h4> 
                     </div><!-- pageheader -->
@@ -182,6 +226,7 @@
                       var lastName = $('#lastName').text();
                       var intials = $('#firstName').text().charAt(0) + $('#lastName').text().charAt(0);
                       var profileImage = $('#profileImage').text(intials);
+                      $('#tree3').treed({openedClass : 'glyphicon-folder-open', closedClass : 'glyphicon-folder-close'});;
                     });
           </script>
 

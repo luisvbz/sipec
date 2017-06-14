@@ -10,6 +10,8 @@ class Participante extends Model
 
 	protected $table = 'principal.datos_basicos';
 
+	public $timestamps = FALSE;
+
 	function datospersonales(){
 
 		return $this->hasOne('sipec\DatosPersonales', 'id_persona', 'id');
@@ -18,11 +20,17 @@ class Participante extends Model
 	function ubicaciones(){
 
 		return $this->belongsToMany('sipec\Ubicacion', 'principal.participantes_ubicacion', 'id_participante', 'id_ubicacion')
-									->withPivot('pensum', 'per_ing', 'estado', 'liga', 'id', 'id_periodo')->where('valores.entorno1.id', '>=', 200);
+									->withPivot('pensum', 'per_ing', 'estado', 'liga', 'id', 'id_periodo')
+									->where('valores.entorno1.id', '>=', 200);
 	}
 
 	function ubicacion(){
 
 		return $this->hasOne('sipec\Ubicacionp', 'id_participante','id' )->where('id_ubicacion', '>=', 200);
+	}
+
+	function talleres(){
+
+		return $this->hasMany('sipec\NotaTalleres', 'id_participante', 'id');
 	}
 }

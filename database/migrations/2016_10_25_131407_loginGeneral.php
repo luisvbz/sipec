@@ -29,10 +29,14 @@ class LoginGeneral extends Migration
             $table->string('icon_class')->nullable();
             $table->string('ruta')->nullable();
             $table->integer('sistema_id');
+            $table->integer('id_arbol');
+            $table->integer('id_padre');
+            $table->string('abrev');
+            $table->boolean('menu');
             $table->timestamps();
         });
 
-        Schema::create('modulos_user', function (Blueprint $table) {
+        Schema::create('modulo_user', function (Blueprint $table) {
             $table->integer('user_id')->unsigned();
             $table->integer('modulo_id')->unsigned();
             $table->boolean('pantalla');

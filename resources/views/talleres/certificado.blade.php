@@ -10,7 +10,8 @@
       		<table border="1" style="width: 100%">
       			<tr rowspan="10">
       				<td><img src="{{ asset('img/certificado/laterales.jpg') }}"></td>
-      				<td><img src="{{ asset('img/certificado/logo_unermb.png') }}"></td>
+      				<td><img src="{{ asset('img/certificado/logo_unermb.png') }}" style="width:197px; height:100px;"></td>
+      				<td><img src="{{ asset('img/certificado/logo_educacion.jpg') }}" style="width:197px; height:100px;"></td>
       				<td style="text-align: right;"><img src="{{ asset('img/certificado/laterales.jpg') }}"></td>
       			</tr>
       		</table>

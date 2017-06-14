@@ -34,9 +34,9 @@ var periodo = $("#periodo :selected").text();
 
 	$("#buscarSecciones").click(function(){
     var seccion = $("input[name='rdseccion']:checked").val();
-		var sede = $("#sede").val();
+		var sede = abrev_sede;
 		var sede_text = $("#sede :selected").text();
-		var programa = $("#sprograma").val();
+		var programa = abrev_proyec;
 		var programa_text = $("#sprograma :selected").text();
 		var periodo = $("#periodo").val();
 		var periodo_text = $("#periodo :selected").text();
@@ -59,9 +59,9 @@ var periodo = $("#periodo :selected").text();
         success: function(data){
         
          if(data.length == 0){
-          	jAlert('No se encontro información disponible con esta busqueda!', 'Advertencia');
+          	jAlert('<h5>No se encontraron secciones para el período: <b>'+periodo_text+'</b> </h5>', 'Advertencia');
 	      	}else{
-	      		$("#encabezadoBusqueda").append('<b>'+programa_text+' - '+sede_text+' - '+periodo_text+'</b>');
+	      		$("#encabezadoBusqueda").append('<b>Periodo: '+periodo_text+'</b>');
 	      		$("#cuantas").html('<b>'+data.length+'</b>');
 	      		for (var i = 0; i < data.length; i++) {
 
@@ -337,7 +337,7 @@ function agregarPart(){
 
     
     $("#mgtools").append('<div class="form-inline pull-left" id="divpart" style="margin-left:0px;">'+
-      '<input type="text" id="addparseccion" onblur ="buscarPart()" name="addparseccion" class="form-control"  placeholder="Cedula de Identidad" style="width:200px; margin-left:50px;">'+
+      '<input type="text" id="addparseccion" onblur ="buscarPart()" name="addparseccion" class="form-control"  placeholder="Cedula de Identidad" style="width:200px; margin-left:10px;">'+
       '<label id="nombrePart" style="width: 400px; margin-left:10px; text-align:left;"></label>'+
       '<button id="btnadd" disabled rel="tooltip" title="Agregar"  class="btn btn-xs btn-success"><i class="fa fa-save"></i></button>'+
       '<button rel="tooltip" title="Cancelar" onclick="CancelarAddPart()" class="btn btn-xs btn-danger"><i class="fa fa-minus"></i></button>'+
@@ -351,7 +351,10 @@ function buscarPart(){
   var nombre = $("#nombrePart");
   var seccion = $("input[name='rdseccion']:checked").val();
   var materia = $("#materia_"+seccion).val();
-  var programa = $("#sprograma").val();
+  var programa = abrev_proyec;
+  var periodo_text = $("#periodo :selected").text();
+  var pensum = $("#pensum_"+seccion).text();
+  var periodo = $("#periodo :selected").text();
 
   $.ajax({
         data: { cedula: cedula, seccion: seccion, programa: programa, materia: materia, periodo: periodo},
@@ -362,34 +365,206 @@ function buscarPart(){
         'X-CSRF-Token': $('input[name="_token"]').val()
         },
         beforeSend: function(){
-          $("#nombrePart").html('<img id="loader" alt="" src="/assets/images/loaders/loader1.gif>');
+          $("#nombrePart").html('<div style="text-align: center;"><i class="fa fa-circle-o-notch fa-spin" style="font-size: 23px; color: #006687"></i>'+
+                              '  Verificando participante, por favor espere ....'+
+                              '</div>');
         }, 
         success: function(data){
           var tipo = data['tipo'];
           var boton = $("#btnadd");
 
-
           if(tipo == 1){
+            //Verificar si trae datos
+          // if(data['datos'].length > 0){
+            var datoscne = data['datos']; //Lennar on el get
+
+            if(datoscne.apellidos == null){
+              datoscne.apellidos = ''
+            }
+
+            if(datoscne.nombres == null){
+              datoscne.nombres = ''
+            }
+           //}else{
+           // var datoscne = {nacionalidad: '', apellidos: '', nombres: ''}; //Pasar ub objeto vacio
+          // }
            
+
              $("#nombrePart").html('<span style="color: #c0392b">'+data['mensaje']+'</span>');
+             
+             $("#mgnuepart").html('<div class="row"><form class="form-horizontal form-bordered" style="padding: 10px;">'+
+                                    '<div class="col-lg-6">'+
+                                    '<div class="form-group" style="padding:5px;">'+
+                                      '<label class="col-lg-4">Cedula</label>'+
+                                      '<div class="col-lg-8"><select class="form-control" name="nac" style="width:40px; position:absolute;"><option value="V">V</option><option value="E">E</option></select><input style="width:80%;margin-left:50px;" type="text" name="cedula" value="'+cedula+'"class="form-control">'+
+                                      '</div>'+
+                                    '</div>'+
+                                    '<div class="form-group" style="padding:5px;">'+
+                                      '<label class="col-lg-4">Apellidos</label>'+
+                                      '<div class="col-lg-8"><input type="text" name="apellidos"  value="'+datoscne.apellidos+'" class="form-control"></div>'+
+                                    '</div>'+
+                                    '<div class="form-group" style="padding:5px;">'+
+                                      '<label class="col-lg-4">Pensum</label>'+
+                                      '<div class="col-lg-8"><select name="pem" class="form-control">'+
+                                        '<option value="'+pensum+'">'+pensum+'</option>'+
+                                      '</select></div>'+
+                                    '</div>'+
+                                    '</div>'+
+                                    '<div class="col-lg-6">'+
+                                    '<div class="form-group" style="padding:5px;">'+
+                                    '<label class="col-lg-4">Sexo</label>'+
+                                    '<div class="col-lg-8"><select class="form-control" name="sexo">'+
+                                      '<option value="M">Masculino</option>'+
+                                      '<option value="F">Femenino</option>'+
+                                    '</select></div>'+
+                                    '</div>'+
+                                    '<div class="form-group" style="padding:5px;">'+
+                                      '<label class="col-lg-4">Nombres</label>'+
+                                      '<div class="col-lg-8"><input type="text" name="nombres" value="'+datoscne.nombres+'" class="form-control"></div>'+
+                                    '</div>'+
+                                    '<div class="form-group" style="padding:5px;">'+
+                                      '<label class="col-lg-4">Periodo</label>'+
+                                      '<div class="col-lg-8"><select name="periodo" class="form-control">'+
+                                        '<option value="'+periodo_text+'">'+periodo_text+'</option>'+
+                                      '</select></div>'+
+                                    '</div>'+
+                                    '</div>'+
+                                  '</div>'+
+                                    '<hr>'+
+                                    '<div class="row">'+
+                                      '<div class="col-lg-10 col-lg-offset-1">'+
+                                        '<center><button class="btn btn-success" onclick="inscribirParticipante();">Listo <i class="fa fa-check-circle"></i></button>'+
+                                        '<button class="btn btn-danger" onclick="CancelarAddPart();">Cancelar <i class="fa fa-warning"></i></button></center>'+
+                                      '</div>'+
+                                    '</form></div>');
+             $("#mgnuepart").show();
 
           }else if(tipo == 2){
 
             $("#nombrePart").html('<span style="color: #c0392b">'+data['mensaje']+'</span>');
 
-          }else if(tipo == 3){
+            $("#mgnuepart").html('<div class="row"><form class="form-horizontal form-bordered" style="padding: 10px;">'+
+                                    '<div class="col-lg-6">'+
+                                    '<div class="form-group" style="padding:5px;">'+
+                                      '<label class="col-lg-4">Pensum</label>'+
+                                      '<div class="col-lg-8"><select name="pem" class="form-control">'+
+                                        '<option value="'+pensum+'">'+pensum+'</option>'+
+                                      '</select></div>'+
+                                    '</div>'+
+                                    '</div>'+
+                                    '<div class="col-lg-6">'+
+                                    '<div class="form-group" style="padding:5px;">'+
+                                      '<label class="col-lg-4">Periodo</label>'+
+                                      '<div class="col-lg-8"><select name="periodo" class="form-control">'+
+                                        '<option value="'+periodo_text+'">'+periodo_text+'</option>'+
+                                      '</select></div>'+
+                                    '</div>'+
+                                    '</div>'+
+                                  '</div>'+
+                                    '<hr>'+
+                                    '<div class="row">'+
+                                      '<div class="col-lg-10 col-lg-offset-1">'+
+                                        '<center><button class="btn btn-success" onclick="inscribirParticipanteUbicacion();">Listo <i class="fa fa-check-circle"></i></button>'+
+                                        '<button class="btn btn-danger" onclick="CancelarAddPart();">Cancelar <i class="fa fa-warning"></i></button></center>'+
+                                      '</div>'+
+                                    '</form></div>');
+            
+            $("#mgnuepart").show();
 
+          }else if(tipo == 3){
+            $("#mgnuepart").hide();
             $("#nombrePart").html('<span style="color: #27ae60">'+data['mensaje']+'</span>');
+
             boton.removeAttr("disabled");
             boton.attr('onClick','agPartSeccion()');
 
           }else if(tipo == 4){
-
+            $("#mgnuepart").hide();
             $("#nombrePart").html('<span style="color: #c0392b">'+data['mensaje']+'</span>');
+
           } 
         }
       });
 
+}
+
+
+function inscribirParticipante(){
+  var pensum = $("#pensum_"+seccion).text();
+  var post = {
+            datos_personales: {
+                    nac: $("select[name='nac']").val(),
+                    cedula: $("input[name='cedula']").val(),
+                    sexo: $("select[name='sexo']").val(),
+                    edo_civil: 1,
+                    apellidos: $("input[name='apellidos']").val(),
+                    nombres: $("input[name='nombres']").val(),
+                    fecnac: 0,
+                    correo: '',
+                    tlf: ''
+                },
+            datos_ubicacion: {
+                sede: abrev_sede,
+                programa: abrev_proyec,
+                pensum: $("select[name='pem']").val(),
+                periodo: periodo,
+                }
+            }
+        $.ajax({
+          data: {data: post},
+          type: 'post',
+          url: '/administracion/participantes/guardar',
+           headers:
+          {
+          'X-CSRF-Token': $('input[name="_token"]').val()
+          },
+          success: function(response){
+            
+            if(response.save == true){
+              $("#mgnuepart").hide();
+              $("#mgnuepart").html();
+              $("#addparseccion").focus();
+              //Buscar de nuevo al participante
+              buscarPart();
+            }
+          }
+
+        });
+}
+
+function inscribirParticipanteUbicacion(){
+  var pensum = $("#pensum_"+seccion).text();
+  var post = {
+            datos_personales: {
+                    cedula: $("#addparseccion").val(),
+                },
+            datos_ubicacion: {
+                sede: abrev_sede,
+                programa: abrev_proyec,
+                pensum: $("select[name='pem']").val(),
+                periodo: periodo,
+                }
+            }
+        $.ajax({
+          data: {data: post},
+          type: 'post',
+          url: '/administracion/participantes/guardarubicacion',
+           headers:
+          {
+          'X-CSRF-Token': $('input[name="_token"]').val()
+          },
+          success: function(response){
+            
+            if(response.save == true){
+              $("#mgnuepart").hide();
+              $("#mgnuepart").html();
+              $("#addparseccion").focus();
+              //Buscar de nuevo al participante
+              buscarPart();
+            }
+          }
+
+        });
 }
 
 function CancelarAddPart(){
@@ -397,6 +572,8 @@ function CancelarAddPart(){
 
 
     $("#divpart").remove();
+    $("#mgnuepart").hide();
+    $("#mgnuepart").html("");
     $("#btnFormAdd").removeAttr("disabled");
 }
 
@@ -406,8 +583,8 @@ function agPartSeccion(){
   var nombre = $("#nombrePart");
   var seccion = $("input[name='rdseccion']:checked").val();
   var programa = $("#sprograma").val();
-  var sede = $("#sede").val();
-  var programa = $("#sprograma").val();
+  var sede = abrev_sede;
+  var programa = abrev_proyec;
   var periodo_text = $("#periodo :selected").text();
   var pensum = $("#pensum_"+seccion).text();
   var codigo = $("#cod_"+seccion).text();
@@ -432,12 +609,15 @@ function agPartSeccion(){
 
           var tipo = data['tipo'];
           var boton = $("#btnadd");
+          if(count == ''){
+            count = 0;
+          }
           var numero = parseInt(count) + 1;
 
           boton.attr("disabled");
 
           $("#divpart").remove();
-
+          console.log(data[0]);
           var nota = data[0][4];
              if(nota == null){
               nota = '-';

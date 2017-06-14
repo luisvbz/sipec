@@ -5,8 +5,8 @@
 @stop
 
 @section('modulo')
-    Programas<br>/
-    <small>Lista de Programas</small>
+    {!! $sede[0]->denominacion!!} /<br>
+    <small style="font-size: 17px">{!! $proy[0]->denominacion !!}</small>
 @stop
 
 
@@ -16,7 +16,7 @@
   @if(Session::has('mensaje'))
   <div class="alert alert-success">
       <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
-      <strong>Well done!</strong> {!! Session::get('mensaje') !!}.
+      <strong>Registro exitoso!</strong> {!! Session::get('mensaje') !!}.
   </div>
   @endif
   <div id="mensajeJS">
@@ -25,7 +25,7 @@
     <div id="panelSecciones" disabled class="panel panel-default ">
     <div class="panel-heading">
       Secciones:  <span id="cuantas"></span>
-      <span class="pull-right" id="encabezadoBusqueda"></span>
+      <span id="encabezadoBusqueda" class="pull-right"></span>
     </div>
     <div class="panel-heading" style="padding: 2px;">
     	<center>
@@ -40,9 +40,9 @@
       @endif
     	</center>
     </div>
-    <div class="panel-body">
-        <table id="tb_programas" style="font-size: 11px;" class="table table-striped">
-            <thead style="text-align: center;" class="">
+    <div class="panel-body" style="padding: 0;;margin-bottom:-20px;">
+      <table class="table table-striped">
+            <thead style="text-align: center;">
                 <tr>
                      <th>-</th>
                      <th>Pesum</th>
@@ -58,8 +58,12 @@
                       @endif
                 </tr>
             </thead>
+        </table>  
+    </div>
+    <div class="panel-body"  style="max-height: calc(85vh - 200px);
+    overflow-y: auto; padding: 0px;">
+        <table id="tb_programas" style="font-size: 11px;" class="table table-striped">
             <tbody>
-            
             </tbody>
             </table>
             </div>
@@ -72,22 +76,6 @@
     </div>
     <div class="panel-body">
     {!! Form::open(array()) !!}
-    	<div class="form-group">
-    	<label>Sede:</label>
-    		<select id="sede" name="sede" class="form-control">
-    			<option value="0">Seleccione la sede</option>
-    			@foreach($sedes as $s)
-    				<option value="{{ $s->abrev }}">{!! $s->denominacion !!}</option>
-    			@endforeach
-    		</select>
-    	</div>
-    	<div class="form-group">
-    		<img id="loader" style="display:none;" alt="" src="{{ asset('assets/images/loaders/loader1.gif') }}">
-    		<div id="programa" style="display:none">
-    			<label>Proyecto:</label>
-    			<select name="programa" id="sprograma" class="form-control"></select>
-    		</div>
-    	</div>
     	<div class="form-group pill-right">
     		<label>Periodo:</label>
     		<select id="periodo" name="periodo" class="form-control">
@@ -120,6 +108,8 @@
 <script type="text/javascript">
     var canEliminar = "{{ Permiso::Eliminar('admprogramas') }}";
     var canIncluir = "{{ Permiso::Incluir('admprogramas') }}";
+    var abrev_proyec = "{{ $proy[0]->abrev }}";
+    var abrev_sede = "{{ $sede[0]->abrev }}";
 </script>
  {!! HTML::script('assets/js/funciones/administracion.js')!!}
 @if(Permiso::Imprimir('admprogramas'))  

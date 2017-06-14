@@ -3,11 +3,29 @@
 Route::group(['prefix' => 'administracion','middleware' => array('auth', 'role:SA|Admin|Asistente')], function () {
 
     Route::get('/participantes', array('as' => 'adm.participantes', 
-                                'middleware' => array('modulo:adm', 'ver:admparticipantes'),'uses' => 'AdministracionController@index'));
+                                'middleware' => array('modulo:admparticipantes', 'ver:admparticipantes'),'uses' => 'AdministracionController@getAllParticipantes'));
+
+    Route::post('/participantes', array('as' => 'filtrar.participantes', 
+                                'middleware' => array('modulo:admparticipantes', 'buscar:admparticipantes'),'uses' => 'AdministracionController@buscarParticipante'));
+
+    Route::post('/participantes/guardar', array('as' => 'guardar.participantes', 
+                                'middleware' => array('modulo:admparticipantes', 'incluir:admparticipantes'),'uses' => 'AdministracionController@guardarParticipante'));
+
+    Route::post('/participantes/guardarubicacion', array('as' => 'guardar.participantesubicacion', 
+                                'middleware' => array('modulo:adm', 'incluir:admparticipantes'),'uses' => 'AdministracionController@guardarParticipanteUbicacion'));
+
+    Route::post('/participantes/actdatosbasicos', array('as' => 'act.datosBasicos', 
+                                'middleware' => array('modulo:admparticipantes', 'modificar:admparticipantes'),'uses' => 'AdministracionController@updateDatosBasicos'));
+
+     Route::post('/participantes/cargarUbiPart', array('as' => 'cargar.ubiPart', 
+                                'middleware' => array('modulo:admparticipantes', 'ver:admparticipantes'),'uses' => 'AdministracionController@cargarUbiPart'));
+
+    Route::post('/buscarCne', array('as' => 'buscar.cne', 
+                                'middleware' => array('modulo:adm', 'buscar:admparticipantes'),'uses' => 'AdministracionController@buscarCne'));
 
     /// Programas
 
-     Route::get('/programas', array('as' => 'adm.programas', 
+     Route::get('/programas/{abrev_proy}/{abrev_sede}', array('as' => 'adm.programas', 
                                 'middleware' => array('modulo:adm', 'ver:admprogramas', 'buscar:admprogramas'),'uses' => 'AdministracionController@programas'));
 
      Route::post('/cargar/proyectos', array('as' => 'adm.proyectos', 
@@ -54,7 +72,7 @@ Route::group(['prefix' => 'administracion','middleware' => array('auth', 'role:S
 
     /// Cursos y talleres
 
-    Route::get('/curtall', array('as' => 'cursos.talleres', 
+    Route::get('/curtall/{abrev_sede}', array('as' => 'cursos.talleres', 
                                 'middleware' => array('modulo:adm', 'ver:curtall'),'uses' => 'CursosyTalleresController@index'));
 
     Route::post('/cargarTallares', array('as' => 'cargar.talleres', 

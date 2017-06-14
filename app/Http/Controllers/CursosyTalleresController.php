@@ -22,23 +22,25 @@ class CursosyTalleresController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index($abrev_sede)
     {
-        $sedes = Sede::orderBy('denominacion', 'ASC')->get();
+        $sede = Sede::where('abrev', $abrev_sede)->get();
 
         $profesores = \DB::Select("SELECT a.id, a.numero_identificacion, a.apellidos, a.nombres
                                       FROM principal.datos_basicos a
                                     INNER JOIN principal.facilitadores_ubicacion b ON a.id = b.id_facilitador
                                     ORDER BY a.apellidos");
 
-        return view('talleres.index', compact('sedes', 'profesores'));
+        return view('talleres.index', compact('sede', 'profesores'));
     }
 
     public function cargaTalleres(Request $request){
 
         if ($request->ajax()) {
                 
-                $secciones = SeccionesTalleres::with('materia', 'profesor')->where('abrev_sede', Input::get('abrev'))
+                $secciones = SeccionesTalleres::with('materia', 'profesor')
+                                    ->where('abrev_sede', Input::get('abrev'))
+                                    ->where('id_periodo', Input::get('anio'))
                                     ->where('anulado', FALSE)
                                     ->orderBy('id', 'DESC')->get();
 
@@ -71,9 +73,10 @@ class CursosyTalleresController extends Controller
 
          if ($request->ajax()) {
                 
-                $anio = '2016';
+                $anio = $request->input('anio');
+               //return $anio;
 
-                $periodo = Periodo::where('nom_periodo',$anio)->get(array('id', 'nom_periodo'));
+                $periodo = Periodo::where('id',$anio)->get(array('id', 'nom_periodo'));
 
                 $curso = Curriculo::find(Input::get('curtall'));
 

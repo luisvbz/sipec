@@ -15,6 +15,9 @@ use sipec\Nota;
 use sipec\Ubicacionp;
 use sipec\Curriculo;
 use sipec\Constancia;
+use sipec\Proyecto;
+use sipec\Cne;
+use sipec\Cne2;
 use N2L;
 use Permiso;
 use Auth;
@@ -24,16 +27,220 @@ use Input;
 class AdministracionController extends Controller
 {
 
-    public function index()
+    public function getAllParticipantes(Request $request)
     {
-        $secciones = Secciones::all();
+        $participantes = Ubicacionp::select('id_participante', 'p.numero_identificacion','p.nacionalidad', 'p.apellidos', 'p.nombres', 'p.edo_civil', 'p.sexo', 'p.correo', 'p.telefono', 'p.fecha_nacimiento')
+                        ->join('principal.datos_basicos as p', 'p.id', '=', 'principal.participantes_ubicacion.id_participante')
+                        ->groupBy('id_participante', 'p.apellidos',  'p.numero_identificacion', 'p.nombres', 'p.edo_civil', 'p.sexo', 'p.correo', 'p.telefono', 'p.nacionalidad', 'p.fecha_nacimiento')
+                        ->where('id_ubicacion','>',200)
+                        ->orderBy('p.apellidos')
+                        ->paginate(10);
+        $sedes = array();
+        foreach (Auth::user()->sedes as $s) {
+            array_push($sedes, $s->id);
+        }
 
-        return var_dump($secciones);
+        $sedes = Sede::whereIn('id', $sedes)->get();
 
-        
+        if($request->ajax()){
+
+            return response()->json($participantes);
+        }
+        return view('admparticipantes.index', compact('sedes'));        
     }
 
-    public function programas(){
+    public function buscarParticipante(Request $request){
+
+        $cedula = $request->input('cedula');
+        $apellidos = $request->input('apellidos');
+        $nombres = $request->input('nombres');
+
+        if($cedula == ""):
+            $cedula = null;
+        endif;
+
+        if($apellidos == ""):
+            $apellidos = null;
+        endif;
+
+        if($nombres == ""):
+            $nombres = null;
+        endif;
+
+        if($cedula == null && $apellidos == null && $nombres == null){
+
+            $participantes =  Ubicacionp::select('id_participante', 'p.numero_identificacion','p.nacionalidad', 'p.apellidos', 'p.nombres', 'p.edo_civil', 'p.sexo', 'p.correo', 'p.telefono', 'p.fecha_nacimiento')
+                        ->join('principal.datos_basicos as p', 'p.id', '=', 'principal.participantes_ubicacion.id_participante')
+                        ->groupBy('id_participante', 'p.numero_identificacion','p.nacionalidad', 'p.apellidos', 'p.nombres', 'p.edo_civil', 'p.sexo', 'p.correo', 'p.telefono', 'p.fecha_nacimiento')
+                        ->where('id_ubicacion','>',200)
+                        ->orderBy('p.apellidos')
+                        ->paginate(10);
+                       // return $cedula;
+        }else if($cedula =! null && $apellidos == null && $nombres == null){
+
+            $participantes =  Ubicacionp::select('id_participante', 'p.numero_identificacion','p.nacionalidad', 'p.apellidos', 'p.nombres', 'p.edo_civil', 'p.sexo', 'p.correo', 'p.telefono','p.fecha_nacimiento')
+                        ->join('principal.datos_basicos as p', 'p.id', '=', 'principal.participantes_ubicacion.id_participante')
+                        ->groupBy('id_participante', 'p.numero_identificacion','p.nacionalidad', 'p.apellidos', 'p.nombres', 'p.edo_civil', 'p.sexo', 'p.correo', 'p.telefono', 'p.fecha_nacimiento')
+                        ->where('id_ubicacion','>',200)
+                        ->where('p.numero_identificacion', $request->input('cedula'))
+                        ->orderBy('p.apellidos')
+                        ->paginate(10);
+
+        }else if($cedula == null && $apellidos =! null && $nombres == null){
+            //return '%'.$request->input('apellidos').'%';
+            $participantes =  Ubicacionp::select('id_participante', 'p.numero_identificacion','p.nacionalidad', 'p.apellidos', 'p.nombres', 'p.edo_civil', 'p.sexo', 'p.correo', 'p.telefono', 'p.fecha_nacimiento')
+                        ->join('principal.datos_basicos as p', 'p.id', '=', 'principal.participantes_ubicacion.id_participante')
+                        ->groupBy('id_participante', 'p.numero_identificacion','p.nacionalidad', 'p.apellidos', 'p.nombres', 'p.edo_civil', 'p.sexo', 'p.correo', 'p.telefono', 'p.fecha_nacimiento')
+                        ->where('id_ubicacion','>',200)
+                        ->where('p.apellidos', 'ilike','%'.$request->input('apellidos').'%')
+                        ->orderBy('p.apellidos')
+                        ->paginate(10);
+
+        }else if($cedula == null && $apellidos == null && $nombres =! null){
+            //return '%'.$request->input('apellidos').'%';
+            $participantes =  Ubicacionp::select('id_participante', 'p.numero_identificacion','p.nacionalidad', 'p.apellidos', 'p.nombres', 'p.edo_civil', 'p.sexo', 'p.correo', 'p.telefono', 'p.fecha_nacimiento')
+                        ->join('principal.datos_basicos as p', 'p.id', '=', 'principal.participantes_ubicacion.id_participante')
+                        ->groupBy('id_participante', 'p.numero_identificacion','p.nacionalidad', 'p.apellidos', 'p.nombres', 'p.edo_civil', 'p.sexo', 'p.correo', 'p.telefono', 'p.fecha_nacimiento')
+                        ->where('id_ubicacion','>',200)
+                        ->where('p.nombres', 'ilike','%'.$request->input('nombres').'%')
+                        ->orderBy('p.apellidos')
+                        ->paginate(10);
+        }else if($cedula == null && $apellidos =! null && $nombres =! null){
+            //return '%'.$request->input('apellidos').'%';
+            $participantes =  Ubicacionp::select('id_participante', 'p.numero_identificacion','p.nacionalidad', 'p.apellidos', 'p.nombres', 'p.edo_civil', 'p.sexo', 'p.correo', 'p.telefono', 'p.fecha_nacimiento')
+                        ->join('principal.datos_basicos as p', 'p.id', '=', 'principal.participantes_ubicacion.id_participante')
+                        ->groupBy('id_participante', 'p.numero_identificacion','p.nacionalidad', 'p.apellidos', 'p.nombres', 'p.edo_civil', 'p.sexo', 'p.correo', 'p.telefono', 'p.fecha_nacimiento')
+                        ->where('id_ubicacion','>',200)
+                        ->where('p.nombres', 'ilike','%'.$request->input('nombres').'%')
+                        ->where('p.apellidos', 'ilike','%'.$request->input('apellidos').'%')
+                        ->orderBy('p.apellidos')
+                        ->paginate(10);
+        }
+
+
+        return response()->json($participantes);
+    }
+
+    public function buscarCne(Request $request){
+
+        $datos = Cne2::buscar('V', $request->input('cedula'));
+
+        return response()->json($datos);
+    }
+
+    public function updateDatosBasicos(Request $request){//Actualizar los datos basicos de participantes
+
+            $data = $request->input('data');
+
+            $part = Participante::find($data['id']);
+            $part->nacionalidad = $data['nac'];
+            $part->apellidos = $data['apellidos'];
+            $part->nombres = $data['nombres'];
+            $part->sexo = $data['sexo'];
+            $part->fecha_nacimiento = $data['fecnac'];
+            $part->correo = $data['correo'];
+            $part->telefono = $data['cod'].'-'.$data['tlf'];
+            $part->edo_civil = $data['edo_civil'];
+            $psave = $part->save();
+
+            if($psave){
+                return response()->json(array('save' => true, 'part' => $part, 'index' => $data['index']));
+            }else{
+                return abort(500);
+            }
+            
+    }
+
+    public function guardarParticipante(Request $request){//Guardar un nuevo participante
+
+        $data = $request->input('data');
+        $datosBasicos = $data['datos_personales'];
+        $datos_ubicacion = $data['datos_ubicacion'];
+
+        //Guardando datos del participante
+
+        $participante = new Participante;
+        $participante->tipo_identificacion = 'C';
+        $participante->nacionalidad = $datosBasicos['nac'];
+        $participante->numero_identificacion = $datosBasicos['cedula'];
+        $participante->apellidos = $datosBasicos['apellidos'];
+        $participante->nombres = $datosBasicos['nombres'];
+        $participante->sexo = $datosBasicos['sexo'];
+        if($datosBasicos['fecnac'] != 0){
+             $participante->fecha_nacimiento = $datosBasicos['fecnac'];
+        }
+        $participante->correo = $datosBasicos['correo'];
+        $participante->edo_civil = $datosBasicos['edo_civil'];
+        $participante->telefono = $datosBasicos['tlf'];
+        $p = $participante->save();
+
+        //Guardando la ubicacion del participante
+
+        $id_ubicacion = Entorno::where('liga_proyectosede', $datos_ubicacion['programa'].'-'.$datos_ubicacion['sede'])->get();
+
+        $ubicacion = new Ubicacionp;
+        $ubicacion->id_participante = $participante->id;
+        $ubicacion->id_ubicacion = $id_ubicacion[0]->id;
+        $ubicacion->pensum = $datos_ubicacion['pensum'];
+        $ubicacion->per_ing = $datos_ubicacion['periodo'];
+        $ubicacion->liga = $participante->numero_identificacion.'/'.$id_ubicacion[0]->liga_proyectosede.'/'.$datos_ubicacion['pensum'];
+        $u = $ubicacion->save();
+
+        if($p == true && $u == true){
+
+            return response()->json(array('save' => true, 'participante' => $participante));
+        }else{
+
+            return abort(500);
+        }
+
+    }
+
+    public function guardarParticipanteUbicacion(Request $request){
+
+        $data = $request->input('data');
+         $datosBasicos = $data['datos_personales'];
+        $datos_ubicacion = $data['datos_ubicacion'];
+
+        $participante = Participante::where('numero_identificacion', $datosBasicos['cedula'])->get();
+
+        $id_ubicacion = Entorno::where('liga_proyectosede', $datos_ubicacion['programa'].'-'.$datos_ubicacion['sede'])->get();
+
+        $ubicacion = new Ubicacionp;
+        $ubicacion->id_participante = $participante[0]->id;
+        $ubicacion->id_ubicacion = $id_ubicacion[0]->id;
+        $ubicacion->pensum = $datos_ubicacion['pensum'];
+        $ubicacion->per_ing = $datos_ubicacion['periodo'];
+        $ubicacion->liga = $participante[0]->numero_identificacion.'/'.$id_ubicacion[0]->liga_proyectosede.'/'.$datos_ubicacion['pensum'];
+        $u = $ubicacion->save();
+
+         if($u == true){
+
+            return response()->json(array('save' => true, 'participante' => $participante[0]));
+        }else{
+
+            return abort(500);
+        }
+
+    }
+
+    public function cargarUbiPart(Request $request){
+
+            $cedula = $request->input('cedula');
+            $participante = Participante::with('ubicacion')->where('numero_identificacion', $cedula)->get();
+            $programas = array();
+
+           foreach ($participante[0]->ubicaciones as $u) {
+                 array_push($programas, array('abrev_proyec' => $u->proyecto->abrev,
+                                              'proy' => $u->proyecto->denominacion,
+                                              'sede' => $u->sede->denominacion,
+                                              'periodo' => $u->pivot->per_ing));
+           }
+
+           return response()->json($programas);
+    }
+
+    public function programas($abrev_proyec, $abrev_sede){
 
 		$total = Secciones::where('anulado', FALSE)->count();
 
@@ -53,8 +260,11 @@ class AdministracionController extends Controller
 			$periodos = Auth::user()->periodos;
 		}
 
+        $sede = Sede::where('abrev', $abrev_sede)->get();
+        $proy = Proyecto::where('abrev', $abrev_proyec)->get();
 
-		return view('administracion.programas', compact('sedes', 'periodos', 'profesores'));    	
+
+		return view('administracion.programas', compact('sedes', 'periodos', 'profesores', 'proy', 'sede'));    	
     }
 
     //carga los proyectos en el select del menu programas
@@ -81,7 +291,6 @@ class AdministracionController extends Controller
     			array_push($parray, array($p->proyecto->abrev, $p->proyecto->denominacion));
     		}
 			
-
     	}
 
     	return response()->json($parray);
@@ -235,14 +444,23 @@ class AdministracionController extends Controller
 
         $liga = Input::get('cedula').'%'.Input::get('programa');
 
-         $ligaseccion = Input::get('periodo').'%'.Input::get('cedula');
+        $ligaseccion = Input::get('periodo').'%'.Input::get('cedula');
 
         $datosbasicos = Participante::where('numero_identificacion', Input::get('cedula'))->get();
 
+       // return $liga;
+
         if(count($datosbasicos) == 0){
 
+            //$cne = Cne::where('cedula', Input::get('cedula'))->get();
+
+            $cne = Cne2::buscar('V',  Input::get('cedula'));
+
+           // return $cne;
+
             $datos = array('tipo' => 1,
-                          'mensaje' => 'EL participante no esta registrado, haga click aqui para registrarlo');
+                           'mensaje' => 'EL participante no esta registrado!',
+                           'datos' => $cne);
 
             return response()->json($datos);
 
@@ -253,13 +471,14 @@ class AdministracionController extends Controller
             if(count($ubicacion) == 0){
 
                 $datos = array('tipo' => 2,
-                          'mensaje' => $datosbasicos[0]['nombres'].' '.$datosbasicos[0]['apellidos'].' '.'Esta regsitrada pero no tiene ubicación, debe registrar la ubicacion');
+                               'mensaje' => $datosbasicos[0]['nombres'].' '.$datosbasicos[0]['apellidos'].' '.'Esta regsitrado(a) pero no tiene ubicación, debe registrar la ubicacion');
 
             return response()->json($datos);
 
             }else{
 
-
+                $materia = Input::get('materia');
+                $id = $datosbasicos[0]['id'];
                 $verficarListaNotas = Nota::where('id_seccion', Input::get('seccion'))->where('id_participante', $datosbasicos[0]['id'])->get();
 
                 $verficarMateria =   \DB::select("SELECT * FROM (SELECT b.id_materia, a.ligaseccion FROM historico_secon.notas a 
@@ -267,7 +486,12 @@ class AdministracionController extends Controller
                                                     WHERE a.id_participante = ? 
                                                     and a.ligaseccion like  ?) as secciones
                                                     WHERE id_materia = ?", array($datosbasicos[0]['id'], $ligaseccion, Input::get('materia')));
-
+                $sql = "SELECT * FROM (SELECT b.id_materia, a.ligaseccion FROM historico_secon.notas a 
+                                                    INNER JOIN historico_secon.secciones b ON a.id_seccion = b.id
+                                                    WHERE a.id_participante = $id 
+                                                    and a.ligaseccion like   $ligaseccion) as secciones
+                                                    WHERE id_materia = $materia";
+                //return $sql;
 
                 if(count($verficarListaNotas) == 0 OR count($verficarMateria) == 0){
                     $datos = array('tipo' => 3,
@@ -292,12 +516,14 @@ class AdministracionController extends Controller
 
          $ligaseccion = Input::get('periodo').'%'.Input::get('cedula');
 
+         //return $ligaseccion;
+
         $datosbasicos = Participante::where('numero_identificacion', Input::get('cedula'))->get();
 
         if(count($datosbasicos) == 0){
 
-           // $datos = array('tipo' => 1,
-             //             'mensaje' => 'EL participante no esta registrado, haga click aqui para registrarlo');
+            $datos = array('tipo' => 1,
+                          'mensaje' => 'EL participante no esta registrado, haga click aqui para registrarlo');
 
             return response()->json($datos);
 
@@ -307,8 +533,8 @@ class AdministracionController extends Controller
 
             if(count($ubicacion) == 0){
 
-               // $datos = array('tipo' => 2,
-                 //         'mensaje' => $datosbasicos[0]['nombres'].' '.$datosbasicos[0]['apellidos'].' '.'Esta regsitrada pero no tiene ubicación, debe registrar la ubicacion');
+               $datos = array('tipo' => 2,
+                         'mensaje' => $datosbasicos[0]['nombres'].' '.$datosbasicos[0]['apellidos'].' '.'Esta regsitrada pero no tiene ubicación, debe registrar la ubicacion');
 
             return response()->json($datos);
 
@@ -326,8 +552,8 @@ class AdministracionController extends Controller
 
                 if(count($verficarListaNotas) == 0 OR count($verficarMateria) == 0){
 
-                   // $datos = array('tipo' => 3,
-                     //     'mensaje' => $datosbasicos[0]['nombres'].' '.$datosbasicos[0]['apellidos']);
+                   $datos = array('tipo' => 3,
+                          'mensaje' => $datosbasicos[0]['nombres'].' '.$datosbasicos[0]['apellidos']);
 
                     $aggPart = new Nota;
                     $aggPart->id_participante = $datosbasicos[0]['id'];
@@ -361,8 +587,8 @@ class AdministracionController extends Controller
 
                 }else {
 
-                   // $datos = array('tipo' => 4,
-                     //     'mensaje' => $datosbasicos[0]['nombres'].' '.$datosbasicos[0]['apellidos']. ' ya esta registrado(a) en esta sección o en la misma materia');
+                    $datos = array('tipo' => 4,
+                          'mensaje' => $datosbasicos[0]['nombres'].' '.$datosbasicos[0]['apellidos']. ' ya esta registrado(a) en esta sección o en la misma materia');
                 }
                 
 
@@ -389,9 +615,11 @@ class AdministracionController extends Controller
         //$participantes = Nota::with('participante')->where('id_seccion', Input::get('id_seccion'))->get();
 
         $participantes = Nota::join('principal.datos_basicos as p', 'p.id', '=', 'historico_secon.notas.id_participante')
+                                //->leftjoin('principal.datos_personales as d', 'd.id_persona', '=', 'historico_secon.notas.id_participante')
                                 ->where('id_seccion', Input::get('id_seccion'))
                                 ->orderBy('p.apellidos', 'ASC')
                                 ->get();
+        //return $participantes;
 
 
         $arrayPar = array();
@@ -404,6 +632,8 @@ class AdministracionController extends Controller
             array_push($arrayPar, array($n++,
                                         number_format($p->participante->numero_identificacion, 0,",", "."), 
                                         $p->participante->apellidos.' '.$p->participante->nombres, 
+                                        $p->participante->correo,
+                                        'N/T',
                                         $p->participante->ubicacion->per_ing,
                                         $p->def,
                                         $p->id_participante,
@@ -539,7 +769,9 @@ class AdministracionController extends Controller
             $constancia->id_seccion = $encabezado[0][15];
             $constancia->save();
 
-            $pdf = \PDF::loadView('administracion.reportes.notasDefinitivas', compact('arrayPar','encabezado'));
+            $id_constancia = $constancia->id;
+
+            $pdf = \PDF::loadView('administracion.reportes.notasDefinitivas', compact('arrayPar','encabezado', 'id_constancia'));
 
             //return view('administracion.reportes.notasDefinitivas', compact('arrayPar','encabezado'));
 

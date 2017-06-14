@@ -1,6 +1,6 @@
 <html>
 <head>
-  <title>Listado de participantes</title>
+  <title>_Mi record academico</title>
   <style type="text/css">
 .page-break {
     page-break-after: always;

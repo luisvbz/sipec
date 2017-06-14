@@ -11,6 +11,7 @@ use sipec\Role;
 use sipec\Permission;
 use Input;
 use sipec\Cne;
+use sipec\Cne2;
 use sipec\Modulo;
 use sipec\UserModulos;
 use sipec\Sede;
@@ -356,13 +357,11 @@ class UsuariosController extends Controller
 
     public function CargarPersonaAjax(Request $request) {
 
-        $persona = Cne::where('cedula', Input::get('cedula'))->get();
+       // $persona = Cne::where('cedula', Input::get('cedula'))->get();
+        $cedula = Input::get('cedula');
+        $persona = Cne2::buscar('V', $cedula);
 
-        foreach ($persona as $p) {
-
-            $arraypersona = array($p->primer_apellido.' '.$p->segundo_apellido,
-                                  $p->primer_nombre.' '.$p->segundo_nombre);
-        }
+        $arraypersona = array($persona['apellidos'], $persona['nombres']);
         
         return response()->json($arraypersona);
     }

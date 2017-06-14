@@ -4,6 +4,10 @@ function imprimirPlanilla(tipo){
     $('[data-toggle="tipoImpresion"]').popover("hide");
 
     var id_seccion = $("input[name='rdseccion']:checked").val();
+
+    if(id_seccion == null){
+       jAlert("Debes elegrir la seccion para poder ver el listado de los participantes!");
+    }
      if(tipo === 1){
       var tabla = $("#planillaPart");
        var curso = tabla.find("tr").eq(1).find("td").eq(1);
@@ -70,7 +74,9 @@ function imprimirPlanilla(tipo){
                         $("#bodyPartPlanilla").append('<tr>'+
                                     '<td class="tg-s6z2">'+p[i][0]+'</td>'+
                                     '<td class="tg-s6z2">'+p[i][1]+'</td>'+
-                                    '<td class="tg-s6z3" colspan="5">'+p[i][2]+'</td>'+
+                                    '<td class="tg-s6z3" colspan="3">'+p[i][2]+'</td>'+
+                                    '<td class="tg-s6z3">'+p[i][3]+'</td>'+
+                                    '<td class="tg-s6z3">'+p[i][4]+'</td>'+
                                   '</tr>');
                       };
                       //  $("#mgtoolsPlanillas").html('<button class="btn btn-success" onClick="imprimirListado(1,'+id_seccion+');">Imprimir <i class="fa fa-print"></i></button>');
@@ -130,6 +136,7 @@ function imprimirPlanilla(tipo){
 
 
                   });
+
         $("#modalNotas").modal();
 
 

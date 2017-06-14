@@ -11,7 +11,7 @@ use Illuminate\Contracts\Auth\Access\Authorizable as AuthorizableContract;
 use Illuminate\Contracts\Auth\CanResetPassword as CanResetPasswordContract;
 use Zizaco\Entrust\Traits\EntrustUserTrait;
 use Auth;
-
+use sipec\Entorno;
 
 class User extends Model implements AuthenticatableContract,
                                     AuthorizableContract,
@@ -59,7 +59,8 @@ class User extends Model implements AuthenticatableContract,
 
     function sedes()
     {
-        return $this->belongsToMany('sipec\Sede', 'sede_user', 'user_id', 'sede_id');
+        return $this->belongsToMany('sipec\Sede', 'sede_user', 'user_id', 'sede_id')
+                ->orderBy('denominacion', 'ASC');
     }
 
     function proyectos()
@@ -69,7 +70,25 @@ class User extends Model implements AuthenticatableContract,
 
     function periodos()
     {
-        return $this->belongsToMany('sipec\Periodo', 'sipec_user.periodo_user', 'user_id', 'periodo_id');
+        return $this->belongsToMany('sipec\Periodo', 'sipec_user.periodo_user', 'user_id', 'periodo_id')->orderBy('periodo_id', 'DESC');
+    }
+
+    public function tree($id_sede, $id_proy)
+    {
+        $programas = Entorno::where('id_sede', $id_sede)->where('id_proy', $id_proy)->get();
+
+        return $programas;
+    }
+
+    public function cursosTalleres(){
+
+        foreach (Auth::user()->modulos as $modulo) {
+           if($modulo->abrev != 'curtall'){
+                    
+           }else{
+                return true;
+           }
+        }
     }
 
 

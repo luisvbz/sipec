@@ -10,6 +10,7 @@ use Input;
 use sipec\Participante;
 use sipec\Secciones;
 use sipec\Nota;
+use sipec\NotaTalleres;
 use sipec\Proyecto;
 use Session;
 
@@ -86,25 +87,39 @@ class ParticipantesController extends Controller
 
     public function cargarProgramas(){
 
-        $participante = Participante::with('ubicaciones')->where('id', Session::get('id_part'))->get();
+        $participante = Participante::with('ubicaciones','talleres')->find(Session::get('id_part'));
 
-        $response = array();
-        foreach ($participante as $p) {
-           foreach ($p->ubicaciones as $u) {
-                 array_push($response, array('abrev_proyec' => $u->proyecto->abrev,
-                                        'proy' => $u->proyecto->denominacion,
-                                        'sede' => $u->sede->denominacion,
-                                        'periodo' => $u->pivot->per_ing));
+        $programas = array();
+        $talleres = array();
+           foreach ($participante->ubicaciones as $u) {
+                 array_push($programas, array('abrev_proyec' => $u->proyecto->abrev,
+                                              'proy' => $u->proyecto->denominacion,
+                                              'sede' => $u->sede->abrev,
+                                              'periodo' => $u->pivot->per_ing));
            }
-        }
 
-        return response()->json($response);
+           foreach ($participante->talleres as $taller) {
+                  array_push($talleres, array('abrev_proyec' => $taller->seccion->materia->unidad_curricular,
+                                               'sede' => $taller->seccion->sede->abrev,
+                                               'periodo' => $taller->seccion->periodo->nom_periodo,
+                                               'inscrito' => $taller->inscrito,
+                                               'asistencia' => $taller->asistencia,
+                                               'aprobado' => $taller->aprobado,
+                                               'solvente' => $taller->solvente,
+                                               'tipo' => $taller->seccion->abrev_proy));
+           }
+
+
+        return response()->json(array($programas, $talleres));
 
     }
 
      public function cargarRecord(Request $request){
 
-        $record = Nota::with('participante', 'seccion')->where('id_participante', Session::get('id_part'))->where('ligaseccion', 'like', '%'.Input::get('abrev').'%')->get();
+        $record = Nota::with('participante', 'seccion')
+                  ->where('id_participante', Session::get('id_part'))
+                  ->where('ligaseccion', 'like', '%'.Input::get('abrev').'%')
+                  ->get();
 
         /* $secciones = Secciones::with('materia')->where('abrev_sede', Input::get('sede'))
                                     ->where('abrev_proy', Input::get('programa'))
